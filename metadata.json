@@ -1,0 +1,5 @@
+{
+  "name": "Financial Tracker",
+  "description": "A modern, mobile-responsive financial tracker application using Supabase for data persistence and Tailwind CSS for styling.",
+  "requestFramePermissions": []
+}
