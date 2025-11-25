@@ -1,13 +1,14 @@
 import React from 'react';
 import { Transaction } from '../types';
-import { ArrowDownLeft, ArrowUpRight, Calendar } from 'lucide-react';
+import { ArrowDownLeft, ArrowUpRight, Calendar, Trash2 } from 'lucide-react';
 
 interface TransactionListProps {
   transactions: Transaction[];
   isLoading: boolean;
+  onDelete: (id: number) => Promise<void>;
 }
 
-export const TransactionList: React.FC<TransactionListProps> = ({ transactions, isLoading }) => {
+export const TransactionList: React.FC<TransactionListProps> = ({ transactions, isLoading, onDelete }) => {
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -55,7 +56,10 @@ export const TransactionList: React.FC<TransactionListProps> = ({ transactions, 
       </div>
       <div className="divide-y divide-gray-100">
         {transactions.map((transaction) => (
-          <div key={transaction.id} className="p-4 hover:bg-gray-50 transition-colors flex items-center justify-between group">
+          <div 
+            key={transaction.id} 
+            className="p-4 hover:bg-gray-50 even:bg-gray-50 transition-colors flex items-center justify-between group"
+          >
             <div className="flex items-center gap-4">
               <div className={`p-2 rounded-full ${
                 transaction.type === 'income' 
@@ -73,10 +77,22 @@ export const TransactionList: React.FC<TransactionListProps> = ({ transactions, 
                 <p className="text-xs text-gray-500">{formatDate(transaction.created_at)}</p>
               </div>
             </div>
-            <div className={`font-semibold ${
-              transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
-            }`}>
-              {transaction.type === 'income' ? '+' : '-'} {formatCurrency(transaction.amount)}
+            
+            <div className="flex items-center gap-4">
+              <div className={`font-semibold ${
+                transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
+              }`}>
+                {transaction.type === 'income' ? '+' : '-'} {formatCurrency(transaction.amount)}
+              </div>
+              
+              <button
+                onClick={() => onDelete(transaction.id)}
+                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100"
+                title="Delete transaction"
+                aria-label="Delete transaction"
+              >
+                <Trash2 className="w-5 h-5" />
+              </button>
             </div>
           </div>
         ))}

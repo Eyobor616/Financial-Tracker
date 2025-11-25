@@ -52,22 +52,39 @@ const App: React.FC = () => {
         created_at: new Date().toISOString(),
       };
 
-      const { data, error: supabaseError } = await supabase
+      const { error: supabaseError } = await supabase
         .from('transactions')
-        .insert([newTransaction])
-        .select()
-        .single();
+        .insert([newTransaction]);
 
       if (supabaseError) throw supabaseError;
 
-      if (data) {
-        setTransactions((prev) => [data, ...prev]);
-      }
+      // Refresh the list to update balance and show new transaction
+      await loadTransactions();
     } catch (err: any) {
       console.error('Error adding transaction:', err);
       setError('Failed to add transaction. Please try again.');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  // Handle deleting a transaction
+  const handleDeleteTransaction = async (id: number) => {
+    try {
+      setError(null);
+      
+      const { error: supabaseError } = await supabase
+        .from('transactions')
+        .delete()
+        .eq('id', id);
+
+      if (supabaseError) throw supabaseError;
+
+      // Refresh the list to update balance and remove deleted transaction
+      await loadTransactions();
+    } catch (err: any) {
+      console.error('Error deleting transaction:', err);
+      setError('Failed to delete transaction. Please try again.');
     }
   };
 
@@ -118,6 +135,7 @@ const App: React.FC = () => {
         <TransactionList 
           transactions={transactions} 
           isLoading={isLoading} 
+          onDelete={handleDeleteTransaction}
         />
       </main>
     </div>
